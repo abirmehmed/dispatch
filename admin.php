@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html><head><title>Admin</title></head><body>
+<html><head><link rel="stylesheet" href="style.css"><title>Admin</title></head><body>
 <h1>Add Link</h1>
 <?php if (isset($_GET['added'])) echo '<p>Saved.</p>'; ?>
 <form method="POST">
