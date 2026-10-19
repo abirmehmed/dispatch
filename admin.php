@@ -9,31 +9,49 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
+$edit_index = null;
+if (isset($_GET['edit'])) {
+    $edit_index = (int)$_GET['edit'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $links[] = [
+    $item = [
         'title' => $_POST['title'],
         'url' => $_POST['url'],
         'description' => $_POST['description'] ?? ''
     ];
+    
+    if (isset($_POST['edit_index']) && $_POST['edit_index'] !== '') {
+        $links[(int)$_POST['edit_index']] = $item;
+    } else {
+        $links[] = $item;
+    }
+    
     file_put_contents($file, json_encode($links, JSON_PRETTY_PRINT));
-    header('Location: admin.php?added=1');
+    header('Location: admin.php');
     exit;
 }
 ?>
 <!DOCTYPE html>
-<html><head><link rel="stylesheet" href="style.css"><title>Admin</title></head><body>
-<h1>Add Link</h1>
-<?php if (isset($_GET['added'])) echo '<p>Saved.</p>'; ?>
+<html>
+<head><title>Admin</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<h1><?= $edit_index !== null ? 'Edit Link' : 'Add Link' ?></h1>
 <form method="POST">
-    <input name="title" placeholder="Title" required><br><br>
-    <input name="url" placeholder="URL" required><br><br>
-    <input name="description" placeholder="Description"><br><br>
-    <button type="submit">Add</button>
+    <?php if ($edit_index !== null): ?>
+        <input type="hidden" name="edit_index" value="<?= $edit_index ?>">
+    <?php endif; ?>
+    <input name="title" placeholder="Title" required value="<?= htmlspecialchars($links[$edit_index]['title'] ?? '') ?>"><br><br>
+    <input name="url" placeholder="URL" required value="<?= htmlspecialchars($links[$edit_index]['url'] ?? '') ?>"><br><br>
+    <input name="description" placeholder="Description" value="<?= htmlspecialchars($links[$edit_index]['description'] ?? '') ?>"><br><br>
+    <button type="submit"><?= $edit_index !== null ? 'Update' : 'Add' ?></button>
+    <?php if ($edit_index !== null): ?> <a href="admin.php" style="margin-left:10px;">Cancel</a> <?php endif; ?>
 </form>
 <h2>Links</h2>
 <ul>
 <?php foreach ($links as $i => $l): ?>
-    <li><?= htmlspecialchars($l['title']) ?> <a href="?delete=<?= $i ?>">[x]</a></li>
+    <li><?= htmlspecialchars($l['title']) ?> <a href="?edit=<?= $i ?>">[edit]</a> <a href="?delete=<?= $i ?>">[x]</a></li>
 <?php endforeach; ?>
 </ul>
-</body></html>
+</body>
+</html>
