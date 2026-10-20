@@ -1,4 +1,5 @@
 <?php
+require "auth.php";
 $file = __DIR__ . '/links.json';
 $links = json_decode(file_get_contents($file), true) ?: [];
 
